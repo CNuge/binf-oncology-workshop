@@ -1,0 +1,12 @@
+name: binf-oncology-workshop
+channels:
+  - s3://package-mirror-sbi-shared/seqbio-pkgs
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - snakemake
+  - snakemake-storage-plugin-s3
+  - snakemake-storage-plugin-http
+  - snakemake-executor-plugin-cluster-generic
+  - seqbiopy

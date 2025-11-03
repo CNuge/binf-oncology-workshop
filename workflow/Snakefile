@@ -1,0 +1,118 @@
+#!/usr/bin/env python3
+
+"""Pipeline title
+
+AUTHORS:
+    N. Name
+
+Brief description here!
+
+This file is the main entry point of your workflow.
+After configuring, running snakemake -n in a clone of this repository should successfully execute a dry-run of the workflow.
+"""
+
+from snakemake.utils import validate
+import pandas as pd
+import pathlib
+import subprocess
+
+
+def annotate_remote_file(fn: str):
+    """
+    Annotation of remote files for data transfer with provenance.
+    Implicit annotation of s3 and http files based on prefix, while a
+    local annotation is applied to all other (non-remote) files
+
+    Revised version for snakemake 8+
+    see: https://snakemake.github.io/snakemake-plugin-catalog/plugins/storage/s3.html
+    This relies on following conda packages being in scope:
+          - snakemake-storage-plugin-s3
+          - snakemake-storage-plugin-http
+    """
+    if fn.startswith("http"):
+        return storage(fn)  # noqa F821
+    elif fn.startswith("s3"):
+        return storage(fn)  # noqa F821
+    else:
+        return local(fn)  # noqa F821
+
+
+# this will print the commit-ish ID to stdout for provenance
+try:
+    label = subprocess.check_output(["git", "describe", "--always"], encoding="UTF-8").strip()
+    print(f"Precision Oncology Workshop workflow {label}")
+except subprocess.CalledProcessError:
+    print("Precision Oncology Workshop workflow, version not detected!")
+
+
+# configure shell behavior for all rules
+shell.executable("/bin/bash")
+shell.prefix("set -euo pipefail; ")
+
+# reference the config file
+configfile: "config/config.yaml"
+validate(config, schema="../schema/config.schema.yaml")
+
+# create temp and log dirs if needed
+pathlib.Path(tempDir).mkdir(parents=True, exist_ok=True)
+pathlib.Path("logs/").mkdir(parents=True, exist_ok=True)
+
+# import variables from config
+sampleFile = config["sampleFile"]
+tempDir = config["tempDir"]
+
+# read in the manifest
+samples = pd.read_csv(sampleFile, sep="\t").set_index("sample", drop=False)
+samples.index.names = ["sample_id"]
+
+
+TARGETS = []
+if config["s3_output_targets"]["report_bucket"]:
+    TARGETS.append(
+        annotate_remote_file(config["s3_output_targets"]["report_bucket"])
+        + "reportable_findings_report.html"
+    )
+if config["s3_output_targets"]["results_bucket"]:
+    TARGETS.append("results/sync/sync.results.done.flag")
+
+rule all:
+    input:
+        # the first rule should define the default target files
+        TARGETS,
+
+
+include: "rules/generate_consent_list.smk"
+
+# put other rules here!
+
+
+if config["s3_output_targets"]["report_bucket"]:
+
+    rule export_report_to_s3:
+        input:
+            "results/report/reportable_findings_report.html",
+        output:
+            annotate_remote_file(
+                config["s3_output_targets"]["report_bucket"] + "reportable_findings_report.html"
+            ),
+        shell:
+            "cp {input} {output}"
+
+
+if config["s3_output_targets"]["results_bucket"]:
+
+    rule export_pipeline_results_to_s3:
+        input:
+            "results/report/reportable_findings_report.html",
+        output:
+            "results/sync/sync.results.done.flag",
+        params:
+            bucket=config["s3_output_targets"]["results_bucket"].rstrip("/"),
+        shell:
+            "aws s3 sync results/ {params.bucket}/results/ --only-show-errors &> {output} && "
+            "aws s3 sync workflow/ {params.bucket}/workflow/ --only-show-errors &>> {output} && "
+            "aws s3 sync config/ {params.bucket}/config/ --only-show-errors &>> {output} && "
+            "aws s3 sync resources/ {params.bucket}/resources/ --only-show-errors &>> {output} && "
+            "aws s3 sync schema/ {params.bucket}/schema/ --only-show-errors &>> {output} && "
+            "aws s3 cp environment.yaml {params.bucket}/environment.yaml &>> {output} && "
+            "aws s3 cp README.md {params.bucket}/README.md &>> {output}"

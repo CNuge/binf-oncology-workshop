@@ -1,0 +1,13 @@
+# This file should contain everything to configure the workflow on a global scale.
+# In case of sample based data, it should be complemented by a manifest file that contains
+# one row per sample that can be parsed easily via pandas.
+manifest: "config/manifest.tsv"
+
+# Required for consent parsing:
+s3_input_targets:
+  consent_bucket: "s3://participant-crosswalk-sbi-prod"
+s3_output_targets:
+  report_bucket: ~
+  results_bucket: ~
+
+study_name_for_consent: "Newfoundland and Labrador Genome Project"

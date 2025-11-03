@@ -1,0 +1,36 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+description: global configuration
+properties:
+  manifest:
+    type: string
+  s3_input_targets:
+    type: object
+    properties:
+      consent_bucket:
+        type: string
+    required:
+      - consent_bucket
+    additionalProperties: false
+  s3_output_targets:
+    type: object
+    properties:
+      report_bucket:
+        oneOf:
+          - type: string
+          - type: "null"
+      results_bucket:
+        oneOf:
+          - type: string
+          - type: "null"
+    required:
+      - report_bucket
+      - results_bucket
+    additionalProperties: false
+  study_name_for_consent:
+    type: string
+required:
+  - manifest
+  - s3_input_targets
+  - s3_output_targets
+  - study_name_for_consent
+additionalProperties: false
