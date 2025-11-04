@@ -100,3 +100,51 @@ giab tumour/normal paired data
 # Module 2 - intro to GATK
 
 
+
+conda config --add channels bioconda
+conda install gatk4
+
+cd /home/ubuntu/CourseData/Module2/FastQs
+
+zless normal_test_1.fastq.gz
+zcat normal_test_1.fastq.gz
+# old timey fastqs with the repeat for the header line!
+zless normal_test_2.fastq.gz
+
+
+# Questions: How many base pairs are the sequencing reads? 
+zcat normal_test_1.fastq.gz | wc -l | awk '{print $1 / 4}'
+
+#400000 / 4
+zgrep "@" normal_test_1.fastq.gz | wc -l
+#Question:* Why would this be a bad idea in practice?
+# - @ is a valid phred encoding - so you would count those lines in a lower qual file
+
+zcat normal_test_2.fastq.gz | wc -l
+#400000 / 4
+
+
+# zcat normal_test_1.fastq.gz | head
+# What is the instrument ID of the sequencer these sequencing reads were generated on? 
+# SRR30646153.1 I think?
+
+#What sequencing lane were the reads from in the normal and the tumour? What were the flowcell IDs?
+# H73FJDSXC - but just cuz I know that looks like a lane id
+#what lane did it come from? 
+
+#cd /home/ubuntu/CourseData/Module2/BAMs
+#samtools stats C-GIAB.tumour.regions_of_interest.bam
+
+# fun fact
+# bed file thickStart thickEnd itemRgb - used by IGV to draw lines on genome.
+
+# Recall:
+#    TTA[G/GC]CCCC
+# - BAM, BED files are 0 based
+#   half-open rangers. start in the range, end is not
+#   3
+# - SAM, VCF are 1-based 
+#   Sam and BAM are slightly different
+#   closed both start and end included in the range
+#  4  G  GC
+
