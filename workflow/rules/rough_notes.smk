@@ -82,10 +82,21 @@ giab tumour/normal paired data
 # panel of normals - instead of sequencing every normal, take 40-60 normal people as a reference cohort
 # can pass this into mutec2 instead of a matched normal.
 
+# Iwk - use nextflow - older stuff was built in toil: https://toil.readthedocs.io/en/latest/
+# whenever you modify a test / binf workflow it needs to be clinically recertified.
+# therefore they are a little slower to update stuff.
 
+# for variant intrepreatation - they use Illumina imagen
+# I asked if intrepreter had experience with Golden Helix and such
+# they said they were fine - 
+# con with the illumina tool is you're pretty locked in on the front end.
 
 # Mutect2? - in gatk
 # https://gatk.broadinstitute.org/hc/en-us/articles/360037593851-Mutect2
 
+
+
+#####
+# Module 2 - intro to GATK
 
 
