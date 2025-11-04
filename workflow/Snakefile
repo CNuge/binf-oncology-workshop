@@ -51,22 +51,18 @@ shell.prefix("set -euo pipefail; ")
 
 # reference the config file
 configfile: "config/config.yaml"
-validate(config, schema="../schema/config.schema.yaml")
-
-# create temp and log dirs if needed
-pathlib.Path(tempDir).mkdir(parents=True, exist_ok=True)
-pathlib.Path("logs/").mkdir(parents=True, exist_ok=True)
+#validate(config, schema="../schema/config.schema.yaml")
 
 # import variables from config
 sampleFile = config["sampleFile"]
-tempDir = config["tempDir"]
 
 # read in the manifest
-samples = pd.read_csv(sampleFile, sep="\t").set_index("sample", drop=False)
-samples.index.names = ["sample_id"]
+samples = pd.read_csv(sampleFile, sep="\t")
+SAMPLES = samples["samples"].values
 
 
 TARGETS = []
+
 if config["s3_output_targets"]["report_bucket"]:
     TARGETS.append(
         annotate_remote_file(config["s3_output_targets"]["report_bucket"])
@@ -81,9 +77,10 @@ rule all:
         TARGETS,
 
 
-include: "rules/generate_consent_list.smk"
 
 # put other rules here!
+
+
 
 
 if config["s3_output_targets"]["report_bucket"]:
