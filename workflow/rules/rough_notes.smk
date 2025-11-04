@@ -40,3 +40,52 @@ giab tumour/normal paired data
 
 #intersting... I guess we can call variants by comparing the
 #tumor to normal to see what has changed - neat variation.
+
+
+# Dr. Gaston - work at IWK, clinical genomics
+# did PhD in rare disease research.
+
+
+###
+# intrepretation of cancer genomics
+
+# - Intrepretation of cancer-associated mutations is always changing
+# more dynamic due to the evolution of new therapies. Things that used to indicate
+# big problems may now indicate that a tumour is druggable
+
+# clinical tests need to be certified in order to get into the clinic
+# 
+
+
+# tumour sequencing - 70-100x (more variance, harder to capture?)
+# says they use PCR - really hope there is some pre-align cleaning that wasn't mentioned.
+
+
+# Questions:
+# joint calling within a cancer setting? (germline v cohort, possibly with a tumour sample)
+# Long read not mentioned - would you use it with infinitie money?
+# Long read - how important are structural variants within cancer characterization and treatment?
+
+
+# Cancer data
+# not just 0/0 0/1 1/1
+# lots of different mutations may be present
+# a tumour is a mix of normal or tumour cells.
+# subclonal mutations and tumour heterogeneity
+# 
+# ^this is why you'd have higher depth in the tumor sequencing
+# basically trying to sample a population.
+
+# tumour - normal matched clinical sequencing.
+
+
+# panel of normals - instead of sequencing every normal, take 40-60 normal people as a reference cohort
+# can pass this into mutec2 instead of a matched normal.
+
+
+
+# Mutect2? - in gatk
+# https://gatk.broadinstitute.org/hc/en-us/articles/360037593851-Mutect2
+
+
+
