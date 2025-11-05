@@ -104,7 +104,7 @@ rule all:
         expand(os.path.join(FINAL_BAM_DIR, "{sample}.recalibrated.bam"), sample=SAMPLES),
         # Initial FastQC reports
         expand(os.path.join(PROCESSING_DIR, "{sample}_test_1_fastqc.html"), sample=SAMPLES),
-        expand(os.path.join(PROCESSING_DIR, "{sample}_test_2_fastqc.html"), sample=SAMPLES)
+        expand(os.path.join(PROCESSING_DIR, "{sample}_test_2_fastqc.html"), sample=SAMPLES),
         # Final annotated VCF
         os.path.join(VCF_DIR, "mutect2_tumour_normal.filtered.regions_of_interest.vep.txt")
 
