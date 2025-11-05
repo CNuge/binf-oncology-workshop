@@ -155,7 +155,7 @@ rule bwa_mem:
     shell:
         """
         docker run --rm {params.docker_mount} {BWA_CONTAINER} \
-            bwa mem {input.ref} {input.r1} {input.r2} -o {params.out_sam}
+            bwa mem {input.ref} {input.r1} {input.r2} -o {output.sam}
         """
 
 # -------------------------------------------------------------------
