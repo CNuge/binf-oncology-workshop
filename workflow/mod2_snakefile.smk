@@ -60,11 +60,9 @@ shell.prefix("set -euo pipefail; ")
 configfile: "config/config.yaml"
 #validate(config, schema="../schema/config.schema.yaml")
 
-# import variables from config
-#sampleFile = config["sampleFile"]
 # TODO - could scale the samples with a manifest
 # read in the manifest
-samples = pd.read_csv(sampleFile, sep="\t")
+samples = pd.read_csv(config["manifest"], sep="\t")
 SAMPLES = samples["samples"].values
 
 # --- Define path variables from config ---
