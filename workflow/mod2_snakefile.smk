@@ -64,8 +64,8 @@ configfile: "config/config.yaml"
 #sampleFile = config["sampleFile"]
 # TODO - could scale the samples with a manifest
 # read in the manifest
-# samples = pd.read_csv(sampleFile, sep="\t")
-# SAMPLES = samples["samples"].values
+samples = pd.read_csv(sampleFile, sep="\t")
+SAMPLES = samples["samples"].values
 
 # --- Define path variables from config ---
 BASE_DIR = config["base_dir"]
@@ -101,10 +101,10 @@ rule all:
         # the first rule should define the default target files
         TARGETS,
         # Final recalibrated BAM for each sample
-        expand(os.path.join(FINAL_BAM_DIR, "{sample}.recalibrated.bam"), sample=config["samples"]),
+        expand(os.path.join(FINAL_BAM_DIR, "{sample}.recalibrated.bam"), sample=SAMPLES),
         # Initial FastQC reports
-        expand(os.path.join(PROCESSING_DIR, "{sample}_test_1_fastqc.html"), sample=config["samples"]),
-        expand(os.path.join(PROCESSING_DIR, "{sample}_test_2_fastqc.html"), sample=config["samples"])
+        expand(os.path.join(PROCESSING_DIR, "{sample}_test_1_fastqc.html"), sample=SAMPLES),
+        expand(os.path.join(PROCESSING_DIR, "{sample}_test_2_fastqc.html"), sample=SAMPLES)
 
 
 # put other rules here!

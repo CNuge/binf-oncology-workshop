@@ -7,10 +7,7 @@
 # This will process 'normal_test_1.fastq.gz' & 'tumour_test_1.fastq.gz' (and their _2 mates)
 
 #TODO - could make a manifest
-# manifest: "config/manifest.tsv"
-samples:
-  - "normal"
-  - "tumour"
+manifest: "config/manifest.tsv"
 
 # Base directory that will be mounted into all Docker containers
 # This path should be absolute.
