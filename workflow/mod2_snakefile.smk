@@ -328,8 +328,8 @@ rule gatk_mutect2:
         docker run --rm {params.docker_mount} {GATK_CONTAINER} gatk \
             --java-options "-Xmx12G" Mutect2 \
             -R {params.ref} \
-            -I {params.input.tumour_bam)} \
-            -I {params.input.normal_bam)} \
+            -I {input.tumour_bam} \
+            -I {input.normal_bam} \
             -normal normal \
             --germline-resource {params.gnomad} \
             -O {output.vcf}
