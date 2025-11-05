@@ -62,8 +62,10 @@ configfile: "config/config.yaml"
 
 # TODO - could scale the samples with a manifest
 # read in the manifest
-samples = pd.read_csv(config["manifest"], sep="\t")
-SAMPLES = samples["samples"].values
+manifest = pd.read_csv(config["manifest"], sep="\t")
+SAMPLES = manifest["sample"].values
+
+
 
 # --- Define path variables from config ---
 BASE_DIR = config["base_dir"]
