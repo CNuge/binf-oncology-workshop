@@ -103,7 +103,8 @@ rule all:
         # Initial FastQC reports
         expand(os.path.join(PROCESSING_DIR, "{sample}_test_1_fastqc.html"), sample=SAMPLES),
         expand(os.path.join(PROCESSING_DIR, "{sample}_test_2_fastqc.html"), sample=SAMPLES)
-
+        # Final annotated VCF
+        os.path.join(VCF_DIR, "mutect2_tumour_normal.filtered.regions_of_interest.vep.txt")
 
 # put other rules here!
 
@@ -293,6 +294,99 @@ rule gatk_apply_bqsr:
             -O {output.bam} --CREATE_INDEX true 
         """
 
+
+
+# -------------------------------------------------------------------
+# RULE 9: GATK Mutect2
+#
+# Call somatic variants using a tumour and matched normal BAM.
+# Note: This rule does not use {sample} wildcard as it requires
+#       both 'normal' and 'tumour' inputs explicitly.
+# -------------------------------------------------------------------
+rule gatk_mutect2:
+    input:
+        tumour_bam=os.path.join(FINAL_BAM_DIR, "tumour.recalibrated.bam"),
+        tumour_bai=os.path.join(FINAL_BAM_DIR, "tumour.recalibrated.bai"),
+        normal_bam=os.path.join(FINAL_BAM_DIR, "normal.recalibrated.bam"),
+        normal_bai=os.path.join(FINAL_BAM_DIR, "normal.recalibrated.bai"),
+        ref=REFERENCE,
+        gnomad=GNOMAD
+    output:
+        vcf=os.path.join(VCF_DIR, "mutect2_tumour_normal.regions_of_interest.vcf.gz"),
+        stats=os.path.join(VCF_DIR, "mutect2_tumour_normal.regions_of_interest.vcf.gz.stats")
+    log:
+        os.path.join(LOG_DIR, "gatk_mutect2", "mutect2.log")
+    params:
+        docker_mount=f"-v {BASE_DIR}:/gatk/CourseData",
+        ref=gatk_path(REFERENCE),
+        gnomad=gatk_path(GNOMAD),
+    shell:
+        """
+        docker run --rm {params.docker_mount} {GATK_CONTAINER} gatk \
+            --java-options "-Xmx12G" Mutect2 \
+            -R {params.ref} \
+            -I {params.input.tumour_bam)} \
+            -I {params.input.normal_bam)} \
+            -normal normal \
+            --germline-resource {params.gnomad} \
+            -O {output.vcf}
+        """
+
+# -------------------------------------------------------------------
+# RULE 10: GATK FilterMutectCalls
+#
+# Filter the raw VCF from Mutect2.
+# -------------------------------------------------------------------
+rule gatk_filter_mutect_calls:
+    input:
+        vcf=os.path.join(VCF_DIR, "mutect2_tumour_normal.regions_of_interest.vcf.gz"),
+        stats=os.path.join(VCF_DIR, "mutect2_tumour_normal.regions_of_interest.vcf.gz.stats"),
+        ref=REFERENCE
+    output:
+        vcf=os.path.join(VCF_DIR, "mutect2_tumour_normal.filtered.regions_of_interest.vcf.gz")
+    log:
+        os.path.join(LOG_DIR, "gatk_filter_mutect_calls", "filter.log")
+    params:
+        docker_mount=f"-v {BASE_DIR}:/gatk/CourseData",
+        ref=gatk_path(REFERENCE),
+    shell:
+        """
+        docker run --rm {params.docker_mount} {GATK_CONTAINER} gatk \
+            --java-options "-Xmx12G" FilterMutectCalls \
+            -R {params.ref} \
+            -V {input.vcf} \
+            -O {output.vcf}
+        """
+
+# -------------------------------------------------------------------
+# RULE 11: VEP Annotation
+#
+# Annotate the filtered VCF using Ensembl VEP via Apptainer/Singularity.
+# -------------------------------------------------------------------
+rule vep_annotate:
+    input:
+        vcf=os.path.join(VCF_DIR, "mutect2_tumour_normal.filtered.regions_of_interest.vcf.gz")
+    output:
+        txt=os.path.join(VCF_DIR, "mutect2_tumour_normal.filtered.regions_of_interest.vep.txt")
+    log:
+        os.path.join(LOG_DIR, "vep_annotate", "vep.log")
+    params:
+        sif=config["vep_sif"],
+        vcf_mount=f"-B {VCF_DIR}:/data",
+        cache_mount=f"-B {config['vep_cache_dir']}:/cache",
+        cache_dir="/cache",
+    shell:
+        """
+        mkdir -p $(dirname {log})
+        apptainer exec {params.vcf_mount} {params.cache_mount} {params.sif} vep \
+            -i {input.vcf} \
+            -o {output.txt} \
+            --cache \
+            --dir_cache {params.cache_dir} \
+            --species homo_sapiens \
+            --assembly GRCh38 \
+            --everything &> {log}
+        """
 
 
 if config["s3_output_targets"]["report_bucket"]:
