@@ -19,6 +19,7 @@ processing_dir: "Module2/Processing"
 final_bam_dir: "Module2/BAMs"
 log_dir: "Module2/Processing/logs" # Directory to store log files
 ref_dir: "tools/reference/GATK-bundle-GRCh38"
+vcf_dir: "Module2/VCFs" # Directory for VCF files
 
 # Reference genome files relative to ref_dir
 reference: "Homo_sapiens_assembly38.fasta"
