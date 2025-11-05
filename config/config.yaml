@@ -1,13 +1,43 @@
 # This file should contain everything to configure the workflow on a global scale.
 # In case of sample based data, it should be complemented by a manifest file that contains
 # one row per sample that can be parsed easily via pandas.
-manifest: "config/manifest.tsv"
 
-# Required for consent parsing:
+
+# List of sample prefixes
+# This will process 'normal_test_1.fastq.gz' & 'tumour_test_1.fastq.gz' (and their _2 mates)
+
+#TODO - could make a manifest
+# manifest: "config/manifest.tsv"
+samples:
+  - "normal"
+  - "tumour"
+
+# Base directory that will be mounted into all Docker containers
+# This path should be absolute.
+base_dir: "/home/ubuntu/CourseData"
+
+# Sub-directories relative to base_dir
+fastq_dir: "Module2/FastQs"
+processing_dir: "Module2/Processing"
+final_bam_dir: "Module2/BAMs"
+log_dir: "Module2/Processing/logs" # Directory to store log files
+ref_dir: "tools/reference/GATK-bundle-GRCh38"
+
+# Reference genome files relative to ref_dir
+reference: "Homo_sapiens_assembly38.fasta"
+dbsnp: "Homo_sapiens_assembly38.dbsnp138.vcf"
+gnomad: "af-only-gnomad.hg38.vcf.gz"
+
+# Docker container images
+containers:
+  fastqc: "pegi3s/fastqc:0.11.9"
+  bwa: "biocontainers/bwa:v0.7.17_cv1"
+  samtools: "biocontainers/samtools:v1.15.1_cv1"
+  gatk: "public.ecr.aws/aws-genomics/broadinstitute/gatk:4.2.6.1-corretto-11"
+
 s3_input_targets:
   consent_bucket: "s3://participant-crosswalk-sbi-prod"
 s3_output_targets:
   report_bucket: ~
   results_bucket: ~
 
-study_name_for_consent: "Newfoundland and Labrador Genome Project"

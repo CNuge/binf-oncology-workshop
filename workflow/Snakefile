@@ -83,6 +83,8 @@ rule all:
 
 
 
+
+
 if config["s3_output_targets"]["report_bucket"]:
 
     rule export_report_to_s3:

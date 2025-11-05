@@ -282,6 +282,9 @@ bcftools head mutect2_tumour_normal.filtered.regions_of_interest.vcf.gz -n 1
 
 
 
+
+
+
 ## Misc notes
 
 #cd /home/ubuntu/CourseData/Module2/BAMs
