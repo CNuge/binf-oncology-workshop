@@ -53,9 +53,8 @@ restricted with time with paywalls introduced
 - once vcfs loaded in, you can take the information and make your own classification
 - links out to google schilar, mastermind, etc.
 
-# free GPT one:
+# free chat-GPT one:
 # https://chatgpt.com/g/g-niDu6xV5q-genomic-variant-interpretator?utm_source=gptshunter.com
-
 
 
 - put in the genes with vcfs
